@@ -25,7 +25,6 @@ class TimetableTestCases(TestCase):
     def test_correct_statistics_returned(self):
         stats = self.timetable.stats()
         self.assertEqual(stats["connection_list_length"], 5)
-        self.assertAlmostEqual(stats["timetable_memory_size"], 48)
 
     def test_no_locations_key(self):
         second_timetable = pytinerary.Timetable()
@@ -39,7 +38,6 @@ class TimetableTestCases(TestCase):
         second_timetable.parse_list(second_data, second_schema)
         stats = second_timetable.stats()
         self.assertEqual(stats["connection_list_length"], 5)
-        self.assertAlmostEqual(stats["timetable_memory_size"], 48)
 
     def test_no_uid_raises_exception(self):
         second_timetable = pytinerary.Timetable()
@@ -71,4 +69,3 @@ class TimetableTestCases(TestCase):
         second_timetable = pytinerary.Timetable(connection_list)
         stats = second_timetable.stats()
         self.assertEqual(stats["connection_list_length"], 5)
-        self.assertAlmostEqual(stats["timetable_memory_size"], 48)

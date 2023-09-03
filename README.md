@@ -10,7 +10,7 @@ The primary function is to take a given timetable, process it into an iterable l
 
 ## Requirements
 
-The only requirement as of now is to use a supported version of Python, which at present is 3.10 and above.
+The only requirement as of now is to use a supported version of Python, which at present is 3.10 and above. **3.9 and below are not supported** and will return a TypeError due to the way in which type definitions are handled.
 
 ## Example
 
