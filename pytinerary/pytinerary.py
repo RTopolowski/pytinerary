@@ -586,12 +586,39 @@ class ItineraryEngine(object):
             k: datetime.datetime.max for k in self.__locations.keys()
         }
 
+    def __merge_connections(self, connections: list) -> list:
+        """
+        Merge connections where possible.
+        @param connections: List of connections to merge.
+        @return: List of merged connections.
+        """
+        merged_connections = []
+        for connection in connections:
+            if len(merged_connections) == 0:
+                merged_connections.append(connection)
+            else:
+                if (
+                    merged_connections[-1].get_arr_loc() == connection.get_dep_loc()
+                    and merged_connections[-1].get_uid() == connection.get_uid()
+                ):
+                    merged_connections[-1] = Connection(
+                        merged_connections[-1].get_uid(),
+                        merged_connections[-1].get_dep_time(),
+                        connection.get_arr_time(),
+                        merged_connections[-1].get_dep_loc(),
+                        connection.get_arr_loc(),
+                    )
+                else:
+                    merged_connections.append(connection)
+        return merged_connections
+
     def generate_itinerary(
         self,
-        origin: Location,
-        destination: Location,
+        origin: Location | str,
+        destination: Location | str,
         planned_time: datetime.datetime,
         arrive_by: bool = False,
+        merge_connections: bool = False,
     ) -> list | None:
         """
         Generate an itinerary based on the initialised timetable and parameters provided.
@@ -601,12 +628,24 @@ class ItineraryEngine(object):
         @param time_type: True if planned_time is a departure time, False if planned_time is an arrival time.
         """
         if isinstance(origin, Location) != True:
-            raise TypeError("Origin must be of type Location")
-        if origin.get_location_id() not in self.__locations.keys():
+            if origin not in self.__locations.keys():
+                raise ValueError("Origin location does not exist")
+            else:
+                origin = self.__locations[str(origin)]
+        elif (
+            isinstance(origin, Location)
+            and origin.get_location_id() not in self.__locations.keys()
+        ):
             raise ValueError("Origin location does not exist")
         if isinstance(destination, Location) != True:
-            raise TypeError("Destination must be of type Location")
-        if destination.get_location_id() not in self.__locations.keys():
+            if destination not in self.__locations.keys():
+                raise ValueError("Destination location does not exist")
+            else:
+                destination = self.__locations[str(destination)]
+        elif (
+            isinstance(destination, Location)
+            and destination.get_location_id() not in self.__locations.keys()
+        ):
             raise ValueError("Destination location does not exist")
         if isinstance(planned_time, datetime.datetime) != True:
             raise TypeError("Planned time must be a datetime object")
@@ -653,7 +692,7 @@ class ItineraryEngine(object):
                 ] = connection.get_arr_time()
                 self.__in_connection[connection.get_arr_loc()] = index
 
-                if connection.get_arr_loc() == origin.get_location_id():
+                if connection.get_arr_loc() == origin.get_location_id():  # type: ignore
                     earliest = min(earliest, connection.get_arr_time())
             elif (
                 arrive_by
@@ -668,14 +707,15 @@ class ItineraryEngine(object):
                 ] = connection.get_dep_time()
                 self.__in_connection[connection.get_dep_loc()] = index
 
-                if connection.get_dep_loc() == destination.get_location_id():
+                if connection.get_dep_loc() == destination.get_location_id():  # type: ignore
                     earliest = min(earliest, connection.get_dep_time())
             elif connection.get_arr_time() > earliest:
                 # No point in searching anymore
                 break
 
+        final_route = []
+
         if arrive_by == False:
-            print(self.__in_connection)
             if self.__in_connection[destination.get_location_id()] == -1:  # type: ignore
                 return []
             else:
@@ -693,15 +733,14 @@ class ItineraryEngine(object):
                     ]
 
                 corrected_route = list(reversed(route))
-                return corrected_route
+                final_route = corrected_route
         else:
-            print(self.__in_connection)
-            if self.__in_connection[origin.get_location_id()] == -1:
+            if self.__in_connection[origin.get_location_id()] == -1:  # type: ignore
                 return []
             else:
                 route = []
 
-                last_connection_index = self.__in_connection[origin.get_location_id()]
+                last_connection_index = self.__in_connection[origin.get_location_id()]  # type: ignore
 
                 while last_connection_index != -1:
                     connection = self.__timetable.get_connections()[
@@ -712,4 +751,9 @@ class ItineraryEngine(object):
                         connection.get_arr_loc()
                     ]
 
-                return route
+                final_route = route
+
+        if merge_connections:
+            return self.__merge_connections(final_route)
+        else:
+            return final_route

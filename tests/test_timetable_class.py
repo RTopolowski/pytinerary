@@ -19,12 +19,12 @@ class TimetableTestCases(TestCase):
         connections = self.timetable.get_connections()
         self.assertEqual(
             str(connections),
-            "ConnectionList([Connection(1, A @ 2023-09-01 00:01:00, B @ 2023-09-01 00:10:00, {}), Connection(1, B @ 2023-09-01 00:11:00, C @ 2023-09-01 00:20:00, {}), Connection(2, A @ 2023-09-01 00:10:00, C @ 2023-09-01 00:15:00, {}), Connection(3, A @ 2023-09-01 00:05:00, B @ 2023-09-01 00:14:00, {}), Connection(4, B @ 2023-09-01 00:22:00, C @ 2023-09-01 00:30:00, {})])",
+            "ConnectionList([Connection(1, A @ 2023-09-01 00:01:00, B @ 2023-09-01 00:10:00, {}), Connection(1, B @ 2023-09-01 00:11:00, C @ 2023-09-01 00:20:00, {}), Connection(2, A @ 2023-09-01 00:10:00, C @ 2023-09-01 00:15:00, {}), Connection(3, A @ 2023-09-01 00:05:00, B @ 2023-09-01 00:14:00, {}), Connection(4, B @ 2023-09-01 00:22:00, C @ 2023-09-01 00:30:00, {}), Connection(5, A @ 2023-09-01 00:31:00, B @ 2023-09-01 00:40:00, {}), Connection(5, B @ 2023-09-01 00:41:00, C @ 2023-09-01 01:00:00, {})])",
         )
 
     def test_correct_statistics_returned(self):
         stats = self.timetable.stats()
-        self.assertEqual(stats["connection_list_length"], 5)
+        self.assertEqual(stats["connection_list_length"], 7)
 
     def test_no_locations_key(self):
         second_timetable = pytinerary.Timetable()
@@ -68,4 +68,4 @@ class TimetableTestCases(TestCase):
         connection_list = self.timetable.get_connections()
         second_timetable = pytinerary.Timetable(connection_list)
         stats = second_timetable.stats()
-        self.assertEqual(stats["connection_list_length"], 5)
+        self.assertEqual(stats["connection_list_length"], 7)

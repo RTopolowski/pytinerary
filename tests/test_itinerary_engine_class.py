@@ -71,13 +71,25 @@ class ItineraryEngineTestCases(TestCase):
         )
         self.assertEqual(route, [])
 
-    def test_invalid_origin_type_raises_exception(self):
-        with self.assertRaises(TypeError):
-            self.engine.generate_itinerary(
-                "A",  # type: ignore
-                self.locations["C"],
-                datetime.datetime(2023, 9, 1, 0, 0, 0),
-            )
+    def test_string_origin_id_is_valid(self):
+        route = self.engine.generate_itinerary(
+            "A",
+            self.locations["C"],
+            datetime.datetime(2023, 9, 1, 0, 0, 0),
+        )
+        self.assertEqual(
+            route,
+            [
+                pytinerary.Connection(
+                    "2",
+                    "2023-09-01 00:10:00",
+                    "2023-09-01 00:15:00",
+                    "A",
+                    "C",
+                    "%Y-%m-%d %H:%M:%S",
+                )
+            ],
+        )
 
     def test_non_existent_origin_raises_exception(self):
         other_locations = {
@@ -93,13 +105,33 @@ class ItineraryEngineTestCases(TestCase):
                 datetime.datetime(2023, 9, 1, 0, 0, 0),
             )
 
-    def test_invalid_destination_type_raises_exception(self):
-        with self.assertRaises(TypeError):
+    def test_non_existent_origin_string_raises_exception(self):
+        with self.assertRaises(ValueError):
             self.engine.generate_itinerary(
-                self.locations["A"],
-                "C",  # type: ignore
+                "D",
+                self.locations["C"],
                 datetime.datetime(2023, 9, 1, 0, 0, 0),
             )
+
+    def test_string_destination_id_is_valid(self):
+        route = self.engine.generate_itinerary(
+            self.locations["A"],
+            "C",
+            datetime.datetime(2023, 9, 1, 0, 0, 0),
+        )
+        self.assertEqual(
+            route,
+            [
+                pytinerary.Connection(
+                    "2",
+                    "2023-09-01 00:10:00",
+                    "2023-09-01 00:15:00",
+                    "A",
+                    "C",
+                    "%Y-%m-%d %H:%M:%S",
+                )
+            ],
+        )
 
     def test_non_existent_destination_raises_exception(self):
         other_locations = {
@@ -112,6 +144,14 @@ class ItineraryEngineTestCases(TestCase):
             self.engine.generate_itinerary(
                 self.locations["A"],
                 other_locations["D"],
+                datetime.datetime(2023, 9, 1, 0, 0, 0),
+            )
+
+    def test_non_existent_destination_string_raises_exception(self):
+        with self.assertRaises(ValueError):
+            self.engine.generate_itinerary(
+                self.locations["C"],
+                "D",
                 datetime.datetime(2023, 9, 1, 0, 0, 0),
             )
 
@@ -131,3 +171,24 @@ class ItineraryEngineTestCases(TestCase):
                 datetime.datetime(2023, 9, 1, 0, 0, 0),
                 123,  # type: ignore
             )
+
+    def test_connections_merged(self):
+        route = self.engine.generate_itinerary(
+            self.locations["A"],
+            self.locations["C"],
+            datetime.datetime(2023, 9, 1, 0, 30, 0),
+            merge_connections=True,
+        )
+        self.assertEqual(
+            route,
+            [
+                pytinerary.Connection(
+                    "5",
+                    "2023-09-01 00:31:00",
+                    "2023-09-01 01:00:00",
+                    "A",
+                    "C",
+                    "%Y-%m-%d %H:%M:%S",
+                )
+            ],
+        )
