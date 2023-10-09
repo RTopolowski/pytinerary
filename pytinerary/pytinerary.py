@@ -3,7 +3,7 @@ Pytinerary - Python library for generating itineraries from a given timetable.
 @Author: Robert Topolowski
 @Date: 23.08.2023
 @Version: 1.0
-@License: MIT
+@License: LGPL-2.1
 
 Copyright (C) 2023 Robert Topolowski
 
