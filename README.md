@@ -14,7 +14,7 @@ The only requirement as of now is to use a supported version of Python, which at
 
 ## Example
 
-This example covers most of what you'll need to get started.
+The below example is a minimum set up example to get it working. Docstrings are provided for function/class parameters. "uid" is the unique identifier for a service.
 
 ```python
 import datetime
@@ -104,12 +104,7 @@ itinerary_one = journey_planner.generate_itinerary(self.locations["A"], self.loc
 
 ## Documentation
 
-Todo, but the comments and unit tests should answer most questions for now.
-
-## Support
-
-This package is provided on a "best effort" basis. You can contact me, the author, via my website, however if you notice an issue and know how to fix it then I would encourage you to make a PR.
-\- Robert Topolowski
+Most (if not all) functions and classes have docstrings provided. "Full" documentation is not yet available.
 
 ## License
 
